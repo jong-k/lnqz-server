@@ -5,11 +5,12 @@ import tseslint from "typescript-eslint";
 import js from "@eslint/js";
 
 export default defineConfig([
-  ...js.configs.recommended,
+  { ignores: ["dist/**"] },
+  js.configs.recommended,
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
     languageOptions: { globals: globals.node },
   },
-  tseslint.configs.recommended,
+  ...tseslint.configs.recommended,
   eslintPluginPrettierRecommended,
 ]);
