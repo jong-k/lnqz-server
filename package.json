@@ -7,7 +7,9 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "build": "tsc",
+    "start": "node ./dist/index.js"
   },
   "keywords": [],
   "author": "",
