@@ -1,16 +1,47 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./types/eslint-plugin-promise.d.ts" />
+
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import { defineConfig } from "eslint/config";
 import globals from "globals";
-import tseslint from "typescript-eslint";
+import { configs as tsConfigs } from "typescript-eslint";
 import js from "@eslint/js";
+import nodePlugin from "eslint-plugin-n";
+import pluginPromise from "eslint-plugin-promise";
+import { importX } from "eslint-plugin-import-x";
+import pluginSecurity from "eslint-plugin-security";
+import { configs as sonarConfigs } from "eslint-plugin-sonarjs";
+import eslintPluginUnicorn from "eslint-plugin-unicorn";
 
 export default defineConfig([
   { ignores: ["dist/**"] },
   js.configs.recommended,
+  importX.flatConfigs.recommended,
+  importX.flatConfigs.typescript,
+  {
+    files: ["**/*.{js,mjs,cjs,ts}"],
+    rules: {
+      "import-x/no-dynamic-require": "warn",
+      "import-x/no-nodejs-modules": "warn",
+    },
+  },
+  nodePlugin.configs["flat/recommended-module"],
+  // eslint-disable-next-line import-x/no-named-as-default-member
+  pluginSecurity.configs.recommended,
+  sonarConfigs.recommended,
+  {
+    plugins: {
+      unicorn: eslintPluginUnicorn,
+    },
+    rules: {
+      "unicorn/better-regex": "error",
+    },
+  },
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
     languageOptions: { globals: globals.node },
   },
-  ...tseslint.configs.recommended,
+  pluginPromise.configs["flat/recommended"],
+  ...tsConfigs.recommended,
   eslintPluginPrettierRecommended,
 ]);
