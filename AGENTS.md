@@ -1,5 +1,13 @@
 # Repository Guidelines
 
+## Project Overview
+
+- This project is the backend server for the URL Shortener service.
+
+## Instructions
+
+- Respond in Korean.
+
 ## Project Structure & Module Organization
 
 - `index.ts`: Fastify server entry (listens on `:3000`).
@@ -24,18 +32,6 @@
 - Linting: ESLint with TypeScript, Node, Import, Promise, Security, SonarJS, Unicorn; `dist/` ignored.
 - TypeScript: strict mode, ESM (`module: nodenext`).
 - Naming: `camelCase` for vars/functions, `PascalCase` for types/classes, prefer `kebab-case` filenames.
-
-## Testing Guidelines
-
-- No test runner is configured yet. When adding tests:
-  - Place in `tests/` and name `*.test.ts`.
-  - Consider Vitest or Jest; aim for meaningful unit tests.
-  - Add a `test` script (e.g., `pnpm test`) and ensure CI can run it.
-
-## Commit & Pull Request Guidelines
-
-- Commits: Follow Conventional Commits (e.g., `feat: ...`, `chore: ...`, `docs: ...`), optional scope, reference PR/issue (e.g., `(#12)`).
-- PRs: Clear description, link issues, include screenshots/logs for behavior changes, small focused diffs, pass `pnpm build` and `pnpm lint`.
 
 ## Security & Configuration Tips
 
