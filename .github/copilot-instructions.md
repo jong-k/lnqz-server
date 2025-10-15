@@ -1,1 +1,1 @@
-Respond in Korean.
+Respond in Korean for all code reviews.
