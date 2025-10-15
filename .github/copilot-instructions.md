@@ -1,1 +1,1 @@
-Respond in Korean for all code reviews.
+Respond in Korean, including for all Pull Request reviews.
