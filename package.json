@@ -1,16 +1,14 @@
 {
   "name": "lnqz-server",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Server for URL Shortener Service",
   "private": true,
   "type": "module",
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "build": "tsc",
-    "start": "node ./dist/index.js"
+    "dev": "tsx watch ./src/app.ts"
   },
   "keywords": [],
   "author": "",
@@ -35,6 +33,7 @@
     "eslint-plugin-unicorn": "^61.0.2",
     "globals": "^16.4.0",
     "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.1"
   }
