@@ -47,6 +47,7 @@ Thumbs.db
 /.pnp
 .pnp.js
 .yarn/install-state.gz
+.pnpm-store/
 
 # SSL keys
 *.pem
