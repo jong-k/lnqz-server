@@ -22,5 +22,7 @@ declare module "eslint-plugin-promise" {
     configs: Record<string, LegacyConfig | FlatConfigLike>;
   };
 
-  export = plugin;
+  // Use default export to play nicely with `verbatimModuleSyntax`
+  // and ESM-style `import pluginPromise from "eslint-plugin-promise"`.
+  export default plugin;
 }
