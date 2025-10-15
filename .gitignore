@@ -50,7 +50,3 @@ Thumbs.db
 
 # SSL keys
 *.pem
-
-# Misc project docs (optional)
-CLAUDE.md
-AGENTS.md
