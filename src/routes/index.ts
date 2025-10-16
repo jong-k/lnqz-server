@@ -36,7 +36,10 @@ export default async function routes(fastify: FastifyInstance) {
       },
     },
     async (request: FastifyRequest<{ Body: { targetUrl: string } }>) => {
-      return request.body;
+      return {
+        code: request.body.targetUrl,
+        targetUrl: request.body.targetUrl,
+      };
     }
   );
 }
