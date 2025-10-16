@@ -1,10 +1,6 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
 
 export default async function routes(fastify: FastifyInstance) {
-  fastify.get("/", async () => {
-    return { hello: "world" };
-  });
-
   fastify.post(
     "/api/urls",
     {
