@@ -1,7 +1,7 @@
 import Fastify from "fastify";
+import Swagger from "@fastify/swagger";
 import SwaggerUI from "@fastify/swagger-ui";
 import routes from "./routes/index.js";
-import Swagger from "@fastify/swagger";
 
 const getLoggerOptions = () => {
   if (process.env.NODE_ENV !== "production") {
