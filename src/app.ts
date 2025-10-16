@@ -1,15 +1,25 @@
 import Fastify from "fastify";
 import routes from "./routes/index.js";
 
-const server = Fastify({ logger: true });
+const fastify = Fastify({
+  logger: {
+    transport: {
+      target: "pino-pretty",
+      options: {
+        translateTime: "HH:MM:ss Z",
+        ignore: "pid,hostname",
+      },
+    },
+  },
+});
 
-server.register(routes);
+fastify.register(routes);
 
 const start = async () => {
   try {
-    await server.listen({ port: 3000 });
+    await fastify.listen({ port: 3000 });
   } catch (err) {
-    server.log.error(err);
+    fastify.log.error(err);
     // eslint-disable-next-line n/no-process-exit
     process.exit(1);
   }
