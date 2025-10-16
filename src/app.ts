@@ -1,16 +1,26 @@
 import Fastify from "fastify";
 import routes from "./routes/index.js";
 
-const fastify = Fastify({
-  logger: {
-    transport: {
-      target: "pino-pretty",
-      options: {
-        translateTime: "HH:MM:ss Z",
-        ignore: "pid,hostname",
+const getLoggerOptions = () => {
+  if (process.env.NODE_ENV !== "production") {
+    return {
+      level: "debug",
+      transport: {
+        target: "pino-pretty",
+        options: {
+          colorize: true,
+          singleLine: true,
+          translateTime: "SYS:HH:MM:ss.l",
+          ignore: "pid,hostname",
+        },
       },
-    },
-  },
+    };
+  }
+  return false;
+};
+
+const fastify = Fastify({
+  logger: getLoggerOptions(),
 });
 
 fastify.register(routes);
