@@ -36,16 +36,14 @@ fastify.register(Swagger, {
   },
 });
 
-if (process.env.NODE_ENV !== "production") {
-  fastify.register(SwaggerUI, {
-    routePrefix: "/docs",
-    staticCSP: true,
-    uiConfig: {
-      docExpansion: "list",
-      deepLinking: false,
-    },
-  });
-}
+fastify.register(SwaggerUI, {
+  routePrefix: "/docs",
+  staticCSP: true,
+  uiConfig: {
+    docExpansion: "list",
+    deepLinking: false,
+  },
+});
 
 fastify.register(routes);
 
