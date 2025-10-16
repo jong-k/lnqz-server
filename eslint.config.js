@@ -1,17 +1,16 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./@types/eslint-plugin-promise.d.ts" />
-
+import { importX } from "eslint-plugin-import-x";
+import nodePlugin from "eslint-plugin-n";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+import pluginPromise from "eslint-plugin-promise";
+import pluginSecurity from "eslint-plugin-security";
+import { configs as sonarConfigs } from "eslint-plugin-sonarjs";
+import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import { defineConfig } from "eslint/config";
 import globals from "globals";
 import { configs as tsConfigs } from "typescript-eslint";
 import js from "@eslint/js";
-import nodePlugin from "eslint-plugin-n";
-import pluginPromise from "eslint-plugin-promise";
-import { importX } from "eslint-plugin-import-x";
-import pluginSecurity from "eslint-plugin-security";
-import { configs as sonarConfigs } from "eslint-plugin-sonarjs";
-import eslintPluginUnicorn from "eslint-plugin-unicorn";
 
 export default defineConfig([
   { ignores: ["dist/**"] },
