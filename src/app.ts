@@ -1,5 +1,7 @@
 import Fastify from "fastify";
+import SwaggerUI from "@fastify/swagger-ui";
 import routes from "./routes/index.js";
+import Swagger from "@fastify/swagger";
 
 const getLoggerOptions = () => {
   if (process.env.NODE_ENV !== "production") {
@@ -22,6 +24,28 @@ const getLoggerOptions = () => {
 const fastify = Fastify({
   logger: getLoggerOptions(),
 });
+
+fastify.register(Swagger, {
+  openapi: {
+    info: {
+      title: "Link Squeeze API",
+      description: "API documentation for Link Squeeze URL shortener service",
+      version: "1.0.0",
+    },
+    servers: [{ url: "http://localhost:3000", description: "Local server" }],
+  },
+});
+
+if (process.env.NODE_ENV !== "production") {
+  fastify.register(SwaggerUI, {
+    routePrefix: "/docs",
+    staticCSP: true,
+    uiConfig: {
+      docExpansion: "list",
+      deepLinking: false,
+    },
+  });
+}
 
 fastify.register(routes);
 
