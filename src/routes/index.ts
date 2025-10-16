@@ -8,4 +8,8 @@ export default async function routes(fastify: FastifyInstance) {
   fastify.get("/health", async (_request, reply) => {
     reply.code(200).send();
   });
+
+  fastify.post("/api/urls", async request => {
+    return request.body;
+  });
 }
