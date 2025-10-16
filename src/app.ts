@@ -1,10 +1,9 @@
 import Fastify from "fastify";
+import routes from "./routes/index.js";
 
 const server = Fastify({ logger: true });
 
-server.get("/", async () => {
-  return { hello: "world" };
-});
+server.register(routes);
 
 const start = async () => {
   try {
