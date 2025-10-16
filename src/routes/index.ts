@@ -4,4 +4,8 @@ export default async function routes(fastify: FastifyInstance) {
   fastify.get("/", async () => {
     return { hello: "world" };
   });
+
+  fastify.get("/health", async (_request, reply) => {
+    reply.code(200).send();
+  });
 }
