@@ -5,10 +5,6 @@ export default async function routes(fastify: FastifyInstance) {
     return { hello: "world" };
   });
 
-  fastify.get("/health", async (_request, reply) => {
-    reply.code(200).send();
-  });
-
   fastify.post(
     "/api/urls",
     {
@@ -40,6 +36,16 @@ export default async function routes(fastify: FastifyInstance) {
         code: request.body.targetUrl,
         targetUrl: request.body.targetUrl,
       };
+    }
+  );
+
+  fastify.get(
+    "/health",
+    {
+      schema: { summary: "서버 상태 확인", tags: ["health check"], response: { 200: {} } },
+    },
+    async (_request, reply) => {
+      reply.code(200).send();
     }
   );
 }
