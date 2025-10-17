@@ -59,6 +59,13 @@ export default async function routes(fastify: FastifyInstance) {
             },
             required: ["shortCode", "targetUrl"],
           },
+          400: {
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+            required: ["message"],
+          },
         },
       },
     },
