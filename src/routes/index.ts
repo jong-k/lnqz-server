@@ -1,4 +1,19 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
+import { randomBytes } from "node:crypto";
+
+const BASE62_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const DEFAULT_CODE_LENGTH = 7;
+
+function generateShortCode(length = DEFAULT_CODE_LENGTH) {
+  const bytes = randomBytes(length);
+  const alphabetLen = BASE62_ALPHABET.length;
+  let out = "";
+  for (const b of bytes) {
+    out += BASE62_ALPHABET.charAt(b % alphabetLen);
+  }
+  // TODO: out 중복 방지 로직 추가
+  return out;
+}
 
 export default async function routes(fastify: FastifyInstance) {
   fastify.post(
@@ -28,10 +43,9 @@ export default async function routes(fastify: FastifyInstance) {
       },
     },
     async (request: FastifyRequest<{ Body: { targetUrl: string } }>) => {
-      return {
-        shortCode: request.body.targetUrl,
-        targetUrl: request.body.targetUrl,
-      };
+      const { targetUrl } = request.body;
+      const shortCode = generateShortCode();
+      return { shortCode, targetUrl };
     }
   );
 
