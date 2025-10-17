@@ -86,7 +86,7 @@ export default async function routes(fastify: FastifyInstance) {
       const { shortCode } = request.params;
       const targetUrl = TEMP_URL_MAP.get(shortCode);
       if (targetUrl) {
-        reply.redirect(targetUrl, 302);
+        reply.redirect(targetUrl);
         return;
       }
       reply.code(404).send({ message: "해당 단축 URL은 존재하지 않습니다." });
