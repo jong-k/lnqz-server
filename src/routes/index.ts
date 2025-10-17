@@ -1,19 +1,15 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { randomBytes } from "node:crypto";
+import { customAlphabet } from "nanoid";
 
 const BASE62_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const DEFAULT_CODE_LENGTH = 7;
-const TEMP_URL_MAP = new Map<string, string>();
+const DEFAULT_SHORTCODE_LENGTH = 7;
+const TEMP_SHORTCODE_MAP = new Map<string, string>();
 
-function generateShortCode(length = DEFAULT_CODE_LENGTH) {
-  const alphabetLen = BASE62_ALPHABET.length;
+function generateShortCode(length = DEFAULT_SHORTCODE_LENGTH) {
+  const nanoid = customAlphabet(BASE62_ALPHABET, length);
   while (true) {
-    const bytes = randomBytes(length);
-    let out = "";
-    for (const b of bytes) {
-      out += BASE62_ALPHABET.charAt(b % alphabetLen);
-    }
-    if (!TEMP_URL_MAP.has(out)) return out;
+    const shortCode = nanoid();
+    if (!TEMP_SHORTCODE_MAP.has(shortCode)) return shortCode;
   }
 }
 
@@ -80,7 +76,7 @@ export default async function routes(fastify: FastifyInstance) {
         return;
       }
       const shortCode = generateShortCode();
-      TEMP_URL_MAP.set(shortCode, targetUrl);
+      TEMP_SHORTCODE_MAP.set(shortCode, targetUrl);
       const fullShortCode = `http://localhost:3000/${shortCode}`;
       return { shortCode: fullShortCode, targetUrl };
     }
@@ -125,7 +121,7 @@ export default async function routes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest<{ Params: { shortCode: string } }>, reply: FastifyReply) => {
       const { shortCode } = request.params;
-      const targetUrl = TEMP_URL_MAP.get(shortCode);
+      const targetUrl = TEMP_SHORTCODE_MAP.get(shortCode);
       if (targetUrl) {
         reply.redirect(targetUrl);
         return;
