@@ -33,6 +33,7 @@ export default defineConfig([
     },
     rules: {
       "unicorn/better-regex": "error",
+      "sonarjs/todo-tag": "off",
     },
   },
   {
