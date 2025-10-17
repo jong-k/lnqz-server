@@ -51,7 +51,7 @@ export default async function routes(fastify: FastifyInstance) {
           additionalProperties: false,
         },
         response: {
-          200: {
+          201: {
             description: "단축 URL 생성 성공",
             type: "object",
             properties: {
