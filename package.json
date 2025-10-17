@@ -1,7 +1,7 @@
 {
   "name": "lnqz-server",
   "version": "1.0.0",
-  "description": "Server for URL Shortener Service",
+  "description": "Server for URL shortener service",
   "private": true,
   "type": "module",
   "scripts": {
