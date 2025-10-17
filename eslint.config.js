@@ -18,10 +18,9 @@ export default defineConfig([
   importX.flatConfigs.recommended,
   importX.flatConfigs.typescript,
   {
-    files: ["**/*.{js,mjs,cjs,ts}"],
+    files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
     rules: {
-      "import-x/no-dynamic-require": "warn",
-      "import-x/no-nodejs-modules": "warn",
+      "import-x/no-nodejs-modules": "off",
     },
   },
   nodePlugin.configs["flat/recommended-module"],
@@ -34,6 +33,7 @@ export default defineConfig([
     },
     rules: {
       "unicorn/better-regex": "error",
+      "sonarjs/todo-tag": "off",
     },
   },
   {
