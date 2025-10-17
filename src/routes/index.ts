@@ -77,8 +77,8 @@ export default async function routes(fastify: FastifyInstance) {
       }
       const shortCode = generateShortCode();
       TEMP_SHORTCODE_MAP.set(shortCode, targetUrl);
-      const fullShortCode = `http://localhost:3000/${shortCode}`;
-      return { shortCode: fullShortCode, targetUrl };
+
+      return { shortCode: `http://localhost:3000/${shortCode}`, targetUrl };
     }
   );
 
