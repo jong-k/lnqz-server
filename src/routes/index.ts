@@ -52,6 +52,7 @@ export default async function routes(fastify: FastifyInstance) {
         },
         response: {
           200: {
+            description: "단축 URL 생성 성공",
             type: "object",
             properties: {
               shortCode: { type: "string", description: "단축 URL" },
@@ -60,6 +61,7 @@ export default async function routes(fastify: FastifyInstance) {
             required: ["shortCode", "targetUrl"],
           },
           400: {
+            description: "잘못된 요청",
             type: "object",
             properties: {
               message: { type: "string" },
@@ -105,8 +107,12 @@ export default async function routes(fastify: FastifyInstance) {
           additionalProperties: false,
         },
         response: {
-          302: {},
+          302: {
+            description: "리다이렉트 성공",
+            type: "null",
+          },
           404: {
+            description: "단축 URL을 찾을 수 없음",
             type: "object",
             properties: {
               message: { type: "string" },
@@ -131,7 +137,16 @@ export default async function routes(fastify: FastifyInstance) {
   fastify.get(
     "/health",
     {
-      schema: { summary: "서버 상태 확인", tags: ["health check"], response: { 200: {} } },
+      schema: {
+        summary: "서버 상태 확인",
+        tags: ["health check"],
+        response: {
+          200: {
+            description: "서버가 정상적으로 작동 중임을 나타냄",
+            type: "null",
+          },
+        },
+      },
     },
     async (_request, reply) => {
       reply.code(200).send();
