@@ -5,7 +5,7 @@ export default async function routes(fastify: FastifyInstance) {
     "/api/urls",
     {
       schema: {
-        summary: "단축된 URL(code) 생성",
+        summary: "단축된 URL(shortCode) 생성",
         tags: ["urls"],
         body: {
           type: "object",
@@ -19,17 +19,17 @@ export default async function routes(fastify: FastifyInstance) {
           200: {
             type: "object",
             properties: {
-              code: { type: "string", description: "단축된 URL" },
+              shortCode: { type: "string", description: "단축된 URL" },
               targetUrl: { type: "string", description: "원본 URL" },
             },
-            required: ["code", "targetUrl"],
+            required: ["shortCode", "targetUrl"],
           },
         },
       },
     },
     async (request: FastifyRequest<{ Body: { targetUrl: string } }>) => {
       return {
-        code: request.body.targetUrl,
+        shortCode: request.body.targetUrl,
         targetUrl: request.body.targetUrl,
       };
     }
