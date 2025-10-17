@@ -1,18 +1,38 @@
-import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { randomBytes } from "node:crypto";
 
 const BASE62_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DEFAULT_CODE_LENGTH = 7;
+const TEMP_URL_MAP = new Map<string, string>();
 
 function generateShortCode(length = DEFAULT_CODE_LENGTH) {
-  const bytes = randomBytes(length);
   const alphabetLen = BASE62_ALPHABET.length;
-  let out = "";
-  for (const b of bytes) {
-    out += BASE62_ALPHABET.charAt(b % alphabetLen);
+  while (true) {
+    const bytes = randomBytes(length);
+    let out = "";
+    for (const b of bytes) {
+      out += BASE62_ALPHABET.charAt(b % alphabetLen);
+    }
+    if (!TEMP_URL_MAP.has(out)) return out;
   }
-  // TODO: out 중복 방지 로직 추가
-  return out;
+}
+
+function validateTargetUrl(targetUrl: unknown): { ok: true } | { ok: false; message: string } {
+  if (!targetUrl || typeof targetUrl !== "string") {
+    return { ok: false, message: "targetUrl이 누락되었습니다." };
+  }
+  if (!targetUrl.startsWith("https://")) {
+    return { ok: false, message: "https로 시작하는 URL만 허용됩니다." };
+  }
+  try {
+    const url = new URL(targetUrl);
+    if (url.protocol !== "https:" || !url.hostname) {
+      return { ok: false, message: "올바른 https URL이 아닙니다." };
+    }
+  } catch {
+    return { ok: false, message: "올바른 https URL이 아닙니다." };
+  }
+  return { ok: true };
 }
 
 export default async function routes(fastify: FastifyInstance) {
@@ -20,7 +40,7 @@ export default async function routes(fastify: FastifyInstance) {
     "/api/urls",
     {
       schema: {
-        summary: "단축된 URL(shortCode) 생성",
+        summary: "단축 URL(shortCode) 생성",
         tags: ["urls"],
         body: {
           type: "object",
@@ -34,7 +54,7 @@ export default async function routes(fastify: FastifyInstance) {
           200: {
             type: "object",
             properties: {
-              shortCode: { type: "string", description: "단축된 URL" },
+              shortCode: { type: "string", description: "단축 URL" },
               targetUrl: { type: "string", description: "원본 URL" },
             },
             required: ["shortCode", "targetUrl"],
@@ -42,10 +62,34 @@ export default async function routes(fastify: FastifyInstance) {
         },
       },
     },
-    async (request: FastifyRequest<{ Body: { targetUrl: string } }>) => {
+    async (request: FastifyRequest<{ Body: { targetUrl: string } }>, reply: FastifyReply) => {
       const { targetUrl } = request.body;
+      const validation = validateTargetUrl(targetUrl);
+
+      if (!validation.ok) {
+        reply.code(400).send({ message: validation.message });
+        return;
+      }
       const shortCode = generateShortCode();
-      return { shortCode, targetUrl };
+      TEMP_URL_MAP.set(shortCode, targetUrl);
+      const fullShortCode = `http://localhost:3000/${shortCode}`;
+      return { shortCode: fullShortCode, targetUrl };
+    }
+  );
+
+  fastify.get(
+    "/:shortCode",
+    {
+      schema: { summary: "shortCode 리다이렉트", tags: ["urls"] },
+    },
+    async (request: FastifyRequest<{ Params: { shortCode: string } }>, reply: FastifyReply) => {
+      const { shortCode } = request.params;
+      const targetUrl = TEMP_URL_MAP.get(shortCode);
+      if (targetUrl) {
+        reply.redirect(targetUrl, 302);
+        return;
+      }
+      reply.code(404).send({ message: "해당 단축 URL은 존재하지 않습니다." });
     }
   );
 
