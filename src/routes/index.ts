@@ -80,7 +80,35 @@ export default async function routes(fastify: FastifyInstance) {
   fastify.get(
     "/:shortCode",
     {
-      schema: { summary: "shortCode 리다이렉트", tags: ["urls"] },
+      schema: {
+        summary: "단축 URL로 리다이렉트",
+        tags: ["urls"],
+        params: {
+          type: "object",
+          properties: {
+            shortCode: {
+              type: "string",
+              description: "단축 코드(7자, 알파벳 대소문자/숫자 조합)",
+              minLength: 7,
+              maxLength: 7,
+              pattern: "^[0-9a-zA-Z]{7}$",
+            },
+          },
+          required: ["shortCode"],
+          additionalProperties: false,
+        },
+        response: {
+          302: {},
+          404: {
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+            required: ["message"],
+            additionalProperties: false,
+          },
+        },
+      },
     },
     async (request: FastifyRequest<{ Params: { shortCode: string } }>, reply: FastifyReply) => {
       const { shortCode } = request.params;
