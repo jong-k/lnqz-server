@@ -21,6 +21,7 @@ export default defineConfig([
     files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
     rules: {
       "import-x/no-nodejs-modules": "off",
+      "import-x/no-named-as-default": "off",
     },
   },
   nodePlugin.configs["flat/recommended-module"],
