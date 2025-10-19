@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import { access } from "node:fs/promises";
+import { join } from "node:path";
 import fastifyPostgres from "@fastify/postgres";
 import Swagger from "@fastify/swagger";
 import SwaggerUI from "@fastify/swagger-ui";
@@ -28,6 +29,14 @@ async function buildServer() {
   const fastify = Fastify({
     logger: getLoggerOptions(),
   });
+
+  if (process.env.NODE_ENV !== "production") {
+    try {
+      await access(join(process.cwd(), ".env"));
+    } catch {
+      throw new Error(".env 파일이 필요합니다.");
+    }
+  }
 
   await fastify.register(envPlugin);
 
