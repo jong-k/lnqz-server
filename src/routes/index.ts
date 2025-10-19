@@ -32,6 +32,21 @@ function validateTargetUrl(targetUrl: unknown): { ok: true } | { ok: false; mess
 }
 
 export default async function routes(fastify: FastifyInstance) {
+  fastify.get(
+    "/",
+    {
+      schema: {
+        summary: "루트 엔드포인트",
+        response: {
+          302: { description: "/docs 페이지로 리다이렉트", type: "null" },
+        },
+      },
+    },
+    async (_request, reply) => {
+      reply.redirect("/docs");
+    }
+  );
+
   fastify.post(
     "/api/urls",
     {
