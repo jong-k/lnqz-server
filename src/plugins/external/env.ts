@@ -14,7 +14,7 @@ declare module "fastify" {
 const schema = {
   type: "object",
   properties: {
-    NODE_ENV: { type: "string", enum: ["development", "test", "production"], default: "development" },
+    NODE_ENV: { type: "string", enum: ["development", "production"], default: "development" },
     PORT: { type: "number", default: 3000 },
     DATABASE_URL: { type: "string" },
   },
