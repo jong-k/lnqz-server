@@ -78,7 +78,7 @@ async function buildServer() {
 const start = async () => {
   try {
     const fastify = await buildServer();
-    const port = Number(process.env.PORT ?? 3000);
+    const port = fastify.config.PORT;
     await fastify.listen({ port });
   } catch (err) {
     console.error(err);
