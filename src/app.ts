@@ -1,6 +1,10 @@
 import Fastify from "fastify";
+import { access } from "node:fs/promises";
+import { join } from "node:path";
+import fastifyPostgres from "@fastify/postgres";
 import Swagger from "@fastify/swagger";
 import SwaggerUI from "@fastify/swagger-ui";
+import envPlugin from "./plugins/external/env.js";
 import routes from "./routes/index.js";
 
 const getLoggerOptions = () => {
@@ -21,37 +25,63 @@ const getLoggerOptions = () => {
   return false;
 };
 
-const fastify = Fastify({
-  logger: getLoggerOptions(),
-});
+async function buildServer() {
+  const fastify = Fastify({
+    logger: getLoggerOptions(),
+  });
 
-fastify.register(Swagger, {
-  openapi: {
-    info: {
-      title: "Link Squeeze API",
-      description: "API documentation for Link Squeeze URL shortener service",
-      version: "1.0.0",
+  if (process.env.NODE_ENV !== "production") {
+    try {
+      await access(join(process.cwd(), ".env"));
+    } catch {
+      throw new Error(".env 파일이 필요합니다.");
+    }
+  }
+
+  await fastify.register(envPlugin);
+
+  const connectionString = fastify.config.DATABASE_URL;
+  try {
+    await fastify.register(fastifyPostgres, { connectionString });
+    await fastify.pg.pool.query("SELECT 1");
+    fastify.log.info("Postgres 연결 성공");
+  } catch (err) {
+    fastify.log.error("Postgres 연결 실패");
+    throw err;
+  }
+
+  await fastify.register(Swagger, {
+    openapi: {
+      info: {
+        title: "Link Squeeze API",
+        description: "API documentation for Link Squeeze URL shortener service",
+        version: "1.0.0",
+      },
+      servers: [{ url: "http://localhost:3000", description: "Local server" }],
     },
-    servers: [{ url: "http://localhost:3000", description: "Local server" }],
-  },
-});
+  });
 
-fastify.register(SwaggerUI, {
-  routePrefix: "/docs",
-  staticCSP: true,
-  uiConfig: {
-    docExpansion: "list",
-    deepLinking: false,
-  },
-});
+  await fastify.register(SwaggerUI, {
+    routePrefix: "/docs",
+    staticCSP: true,
+    uiConfig: {
+      docExpansion: "list",
+      deepLinking: false,
+    },
+  });
 
-fastify.register(routes);
+  await fastify.register(routes);
+
+  return fastify;
+}
 
 const start = async () => {
   try {
-    await fastify.listen({ port: 3000 });
+    const fastify = await buildServer();
+    const port = fastify.config.PORT;
+    await fastify.listen({ port });
   } catch (err) {
-    fastify.log.error(err);
+    console.error(err);
     // eslint-disable-next-line n/no-process-exit
     process.exit(1);
   }

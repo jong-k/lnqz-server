@@ -15,17 +15,21 @@
   "license": "ISC",
   "packageManager": "pnpm@10.18.2",
   "dependencies": {
+    "@fastify/env": "^5.0.3",
+    "@fastify/postgres": "^6.0.2",
     "@fastify/swagger": "^9.5.2",
     "@fastify/swagger-ui": "^5.2.3",
     "fastify": "^5.6.1",
     "fastify-plugin": "^5.1.0",
-    "nanoid": "^5.1.6"
+    "nanoid": "^5.1.6",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/eslint-plugin-security": "^3.0.0",
     "@types/node": "^24.7.2",
+    "@types/pg": "^8.15.5",
     "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
