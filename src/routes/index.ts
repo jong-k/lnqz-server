@@ -1,16 +1,14 @@
+import { eq } from "drizzle-orm";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { customAlphabet } from "nanoid";
+import { urls } from "../db/schema.js";
 
 const BASE62_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DEFAULT_SHORTCODE_LENGTH = 7;
-const TEMP_SHORTCODE_MAP = new Map<string, string>();
 
 function generateShortCode(length = DEFAULT_SHORTCODE_LENGTH) {
   const nanoid = customAlphabet(BASE62_ALPHABET, length);
-  while (true) {
-    const shortCode = nanoid();
-    if (!TEMP_SHORTCODE_MAP.has(shortCode)) return shortCode;
-  }
+  return nanoid();
 }
 
 function validateTargetUrl(targetUrl: unknown): { ok: true } | { ok: false; message: string } {
@@ -90,10 +88,23 @@ export default async function routes(fastify: FastifyInstance) {
         reply.code(400).send({ message: validation.message });
         return;
       }
-      const shortCode = generateShortCode();
-      TEMP_SHORTCODE_MAP.set(shortCode, targetUrl);
-
-      return { shortCode: `http://localhost:3000/${shortCode}`, targetUrl };
+      // 유니크 충돌 시 짧게 재시도
+      const MAX_RETRIES = 3;
+      let attempt = 0;
+      while (attempt < MAX_RETRIES) {
+        const shortCode = generateShortCode();
+        const inserted = await fastify.db
+          .insert(urls)
+          .values({ shortCode, targetUrl })
+          .onConflictDoNothing({ target: urls.shortCode })
+          .returning();
+        if (inserted.length > 0) {
+          return { shortCode: `http://localhost:3000/${shortCode}`, targetUrl };
+        }
+        attempt++;
+      }
+      // 재시도 초과 시 에러 처리
+      reply.code(500).send({ message: "단축 코드 생성에 실패했습니다. 다시 시도해주세요." });
     }
   );
 
@@ -136,9 +147,14 @@ export default async function routes(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest<{ Params: { shortCode: string } }>, reply: FastifyReply) => {
       const { shortCode } = request.params;
-      const targetUrl = TEMP_SHORTCODE_MAP.get(shortCode);
-      if (targetUrl) {
-        reply.redirect(targetUrl);
+      const row = await fastify.db
+        .select({ targetUrl: urls.targetUrl })
+        .from(urls)
+        .where(eq(urls.shortCode, shortCode))
+        .limit(1);
+
+      if (row.length > 0) {
+        reply.redirect(row[0].targetUrl);
         return;
       }
       reply.code(404).send({ message: "해당 단축 URL은 존재하지 않습니다." });

@@ -14,6 +14,19 @@ import js from "@eslint/js";
 
 export default defineConfig([
   { ignores: ["dist/**"] },
+  // 글로벌 설정: import-x resolver 활성화(node, typescript)
+  {
+    settings: {
+      "import-x/resolver": {
+        node: true,
+        typescript: {
+          // tsconfig를 자동 탐색(project: true) 및 @types 우선 시도
+          project: true,
+          alwaysTryTypes: true,
+        },
+      },
+    },
+  },
   js.configs.recommended,
   importX.flatConfigs.recommended,
   importX.flatConfigs.typescript,
@@ -25,7 +38,6 @@ export default defineConfig([
     },
   },
   nodePlugin.configs["flat/recommended-module"],
-  // eslint-disable-next-line import-x/no-named-as-default-member
   pluginSecurity.configs.recommended,
   sonarConfigs.recommended,
   {

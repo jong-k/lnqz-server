@@ -18,6 +18,7 @@ const schema = {
     PORT: { type: "number", default: 3000 },
     DATABASE_URL: { type: "string" },
   },
+  required: ["DATABASE_URL"],
 };
 
 export default fp(async fastify => {
