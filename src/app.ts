@@ -1,3 +1,5 @@
+import { drizzle } from "drizzle-orm/node-postgres";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import Fastify from "fastify";
 import { access } from "node:fs/promises";
 import { join } from "node:path";
@@ -6,6 +8,12 @@ import Swagger from "@fastify/swagger";
 import SwaggerUI from "@fastify/swagger-ui";
 import envPlugin from "./plugins/external/env.js";
 import routes from "./routes/index.js";
+
+declare module "fastify" {
+  interface FastifyInstance {
+    db: NodePgDatabase;
+  }
+}
 
 const getLoggerOptions = () => {
   if (process.env.NODE_ENV !== "production") {
@@ -49,6 +57,9 @@ async function buildServer() {
     fastify.log.error("Postgres 연결 실패");
     throw err;
   }
+
+  const db = drizzle(fastify.pg.pool);
+  fastify.decorate("db", db);
 
   await fastify.register(Swagger, {
     openapi: {
