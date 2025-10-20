@@ -112,7 +112,7 @@ export default async function routes(fastify: FastifyInstance) {
     "/:shortCode",
     {
       schema: {
-        summary: "단축 URL로 리다이렉트",
+        summary: "단축 URL로 리다이렉트(스웨거에서는 실행 불가)",
         tags: ["urls"],
         params: {
           type: "object",
