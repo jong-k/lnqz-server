@@ -49,7 +49,7 @@ export default async function routes(fastify: FastifyInstance) {
     "/api/urls",
     {
       schema: {
-        summary: "단축 URL(shortCode) 생성",
+        summary: "단축 URL(shortUrl) 생성",
         tags: ["urls"],
         body: {
           type: "object",
@@ -64,10 +64,10 @@ export default async function routes(fastify: FastifyInstance) {
             description: "단축 URL 생성 성공",
             type: "object",
             properties: {
-              shortCode: { type: "string", description: "단축 URL" },
+              shortUrl: { type: "string", description: "단축 URL" },
               targetUrl: { type: "string", description: "원본 URL" },
             },
-            required: ["shortCode", "targetUrl"],
+            required: ["shortUrl", "targetUrl"],
           },
           400: {
             description: "잘못된 요청",
@@ -99,7 +99,7 @@ export default async function routes(fastify: FastifyInstance) {
           .onConflictDoNothing({ target: urls.shortCode })
           .returning();
         if (inserted.length > 0) {
-          return { shortCode: `${fastify.config.BASE_URL}/${shortCode}`, targetUrl };
+          return { shortUrl: `${fastify.config.BASE_URL}/${shortCode}`, targetUrl };
         }
         attempt++;
       }
