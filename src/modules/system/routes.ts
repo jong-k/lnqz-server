@@ -34,20 +34,19 @@ const plugin: FastifyPluginAsync = async fastify => {
             description: "",
             type: "object",
             properties: {
-              properties: {
-                message: { type: "string", description: "" },
-              },
-              required: ["message"],
-              additionalProperties: false,
+              message: { type: "string", description: "" },
             },
+            required: ["message"],
+            additionalProperties: false,
           },
         },
       },
     },
-    ({ protocol, hostname }) => {
-      return {
-        message: `See documentation at ${protocol}://${hostname}/docs`,
-      };
+    async ({ protocol, hostname }, reply) => {
+      const port = fastify.config.PORT;
+      reply.send({
+        message: `See documentation at ${protocol}://${hostname}:${port}/docs`,
+      });
     }
   );
 
