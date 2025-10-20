@@ -1,17 +1,17 @@
 import { eq } from "drizzle-orm";
-import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
 import { customAlphabet } from "nanoid";
-import { urls } from "../db/schema.js";
+import { urls } from "../../db/schema.js";
 
 const BASE62_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DEFAULT_SHORTCODE_LENGTH = 7;
 
-function generateShortCode(length = DEFAULT_SHORTCODE_LENGTH) {
+const generateShortCode = (length = DEFAULT_SHORTCODE_LENGTH) => {
   const nanoid = customAlphabet(BASE62_ALPHABET, length);
   return nanoid();
-}
+};
 
-function validateTargetUrl(targetUrl: unknown): { ok: true } | { ok: false; message: string } {
+const validateTargetUrl = (targetUrl: unknown): { ok: true } | { ok: false; message: string } => {
   if (!targetUrl || typeof targetUrl !== "string") {
     return { ok: false, message: "targetUrl이 누락되었습니다." };
   }
@@ -27,24 +27,9 @@ function validateTargetUrl(targetUrl: unknown): { ok: true } | { ok: false; mess
     return { ok: false, message: "올바른 https URL이 아닙니다." };
   }
   return { ok: true };
-}
+};
 
-export default async function routes(fastify: FastifyInstance) {
-  fastify.get(
-    "/",
-    {
-      schema: {
-        summary: "루트 엔드포인트",
-        response: {
-          302: { description: "/docs 페이지로 리다이렉트", type: "null" },
-        },
-      },
-    },
-    async (_request, reply) => {
-      reply.redirect("/docs");
-    }
-  );
-
+const plugin: FastifyPluginAsync = async fastify => {
   fastify.post(
     "/api/urls",
     {
@@ -160,23 +145,6 @@ export default async function routes(fastify: FastifyInstance) {
       reply.code(404).send({ message: "해당 단축 URL은 존재하지 않습니다." });
     }
   );
+};
 
-  fastify.get(
-    "/health",
-    {
-      schema: {
-        summary: "서버 상태 확인",
-        tags: ["health check"],
-        response: {
-          200: {
-            description: "서버가 정상적으로 작동 중임을 나타냄",
-            type: "null",
-          },
-        },
-      },
-    },
-    async (_request, reply) => {
-      reply.code(200).send();
-    }
-  );
-}
+export default plugin;

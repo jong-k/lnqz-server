@@ -6,8 +6,9 @@ import { join } from "node:path";
 import fastifyPostgres from "@fastify/postgres";
 import Swagger from "@fastify/swagger";
 import SwaggerUI from "@fastify/swagger-ui";
+import systemRoutes from "./modules/system/routes.js";
+import urlsRoutes from "./modules/urls/routes.js";
 import envPlugin from "./plugins/external/env.js";
-import routes from "./routes/index.js";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -81,7 +82,8 @@ async function buildServer() {
     },
   });
 
-  await fastify.register(routes);
+  await fastify.register(systemRoutes);
+  await fastify.register(urlsRoutes);
 
   return fastify;
 }
