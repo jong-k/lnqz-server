@@ -11,7 +11,11 @@ const plugin: FastifyPluginAsync = async fastify => {
         body: {
           type: "object",
           properties: {
-            targetUrl: { type: "string", description: "원본 URL" },
+            targetUrl: {
+              type: "string",
+              description: "원본 URL (https만 허용)",
+              examples: ["https://example.com/path?q=1"],
+            },
           },
           required: ["targetUrl"],
           additionalProperties: false,
@@ -25,6 +29,12 @@ const plugin: FastifyPluginAsync = async fastify => {
               targetUrl: { type: "string", description: "원본 URL" },
             },
             required: ["shortUrl", "targetUrl"],
+            examples: [
+              {
+                shortUrl: `${fastify.config.BASE_URL}/a1b2C3D`,
+                targetUrl: "https://example.com/path?q=1",
+              },
+            ],
           },
           400: {
             description: "잘못된 요청",
@@ -33,6 +43,7 @@ const plugin: FastifyPluginAsync = async fastify => {
               message: { type: "string" },
             },
             required: ["message"],
+            examples: [{ message: "https로 시작하는 URL만 허용됩니다." }, { message: "targetUrl이 누락되었습니다." }],
           },
         },
       },
@@ -63,6 +74,7 @@ const plugin: FastifyPluginAsync = async fastify => {
               minLength: 7,
               maxLength: 7,
               pattern: "^[0-9a-zA-Z]{7}$",
+              examples: ["a1b2C3D"],
             },
           },
           required: ["shortCode"],
@@ -81,6 +93,7 @@ const plugin: FastifyPluginAsync = async fastify => {
             },
             required: ["message"],
             additionalProperties: false,
+            examples: [{ message: "해당 단축 URL은 존재하지 않습니다." }],
           },
         },
       },
