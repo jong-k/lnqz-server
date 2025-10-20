@@ -6,6 +6,7 @@ declare module "fastify" {
     config: {
       PORT: number;
       NODE_ENV: "development" | "production";
+      BASE_URL: string;
       DATABASE_URL: string;
     };
   }
@@ -16,6 +17,7 @@ const schema = {
   properties: {
     NODE_ENV: { type: "string", enum: ["development", "production"], default: "development" },
     PORT: { type: "number", default: 3000 },
+    BASE_URL: { type: "string" },
     DATABASE_URL: { type: "string" },
   },
   required: ["DATABASE_URL"],

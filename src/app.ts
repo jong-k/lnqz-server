@@ -68,7 +68,7 @@ async function buildServer() {
         description: "API documentation for Link Squeeze URL shortener service",
         version: "1.0.0",
       },
-      servers: [{ url: "http://localhost:3000", description: "Local server" }],
+      servers: [{ url: fastify.config.BASE_URL, description: "Local server" }],
     },
   });
 

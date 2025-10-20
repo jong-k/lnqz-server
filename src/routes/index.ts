@@ -99,7 +99,7 @@ export default async function routes(fastify: FastifyInstance) {
           .onConflictDoNothing({ target: urls.shortCode })
           .returning();
         if (inserted.length > 0) {
-          return { shortCode: `http://localhost:3000/${shortCode}`, targetUrl };
+          return { shortCode: `${fastify.config.BASE_URL}/${shortCode}`, targetUrl };
         }
         attempt++;
       }
