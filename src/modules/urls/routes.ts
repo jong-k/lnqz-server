@@ -94,7 +94,7 @@ const plugin: FastifyPluginAsync = async fastify => {
   );
 
   fastify.get(
-    "/:shortCode",
+    "/:shortCode(^[0-9a-zA-Z]{7}$)",
     {
       schema: {
         summary: "단축 URL로 리다이렉트(스웨거에서는 실행 불가)",
