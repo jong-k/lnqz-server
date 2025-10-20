@@ -44,7 +44,7 @@ const plugin: FastifyPluginAsync = async fastify => {
         reply.code(result.status ?? 500).send({ message: result.message });
         return;
       }
-      return { shortUrl: result.shortUrl, targetUrl: result.targetUrl };
+      reply.code(201).send({ shortUrl: result.shortUrl, targetUrl: result.targetUrl });
     }
   );
 
