@@ -1,7 +1,6 @@
-import { eq } from "drizzle-orm";
 import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
 import { customAlphabet } from "nanoid";
-import { urls } from "../../db/schema.js";
+import { createShortUrl, getTargetUrlByShortCode } from "./repository.js";
 
 const BASE62_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DEFAULT_SHORTCODE_LENGTH = 7;
@@ -78,12 +77,8 @@ const plugin: FastifyPluginAsync = async fastify => {
       let attempt = 0;
       while (attempt < MAX_RETRIES) {
         const shortCode = generateShortCode();
-        const inserted = await fastify.db
-          .insert(urls)
-          .values({ shortCode, targetUrl })
-          .onConflictDoNothing({ target: urls.shortCode })
-          .returning();
-        if (inserted.length > 0) {
+        const created = await createShortUrl(fastify.db, shortCode, targetUrl);
+        if (created) {
           return { shortUrl: `${fastify.config.BASE_URL}/${shortCode}`, targetUrl };
         }
         attempt++;
@@ -132,14 +127,9 @@ const plugin: FastifyPluginAsync = async fastify => {
     },
     async (request: FastifyRequest<{ Params: { shortCode: string } }>, reply: FastifyReply) => {
       const { shortCode } = request.params;
-      const row = await fastify.db
-        .select({ targetUrl: urls.targetUrl })
-        .from(urls)
-        .where(eq(urls.shortCode, shortCode))
-        .limit(1);
-
-      if (row.length > 0) {
-        reply.redirect(row[0].targetUrl);
+      const target = await getTargetUrlByShortCode(fastify.db, shortCode);
+      if (target) {
+        reply.redirect(target);
         return;
       }
       reply.code(404).send({ message: "해당 단축 URL은 존재하지 않습니다." });
