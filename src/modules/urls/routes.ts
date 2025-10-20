@@ -1,32 +1,5 @@
 import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
-import { customAlphabet } from "nanoid";
-import { createShortUrl, getTargetUrlByShortCode } from "./repository.js";
-
-const BASE62_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const DEFAULT_SHORTCODE_LENGTH = 7;
-
-const generateShortCode = (length = DEFAULT_SHORTCODE_LENGTH) => {
-  const nanoid = customAlphabet(BASE62_ALPHABET, length);
-  return nanoid();
-};
-
-const validateTargetUrl = (targetUrl: unknown): { ok: true } | { ok: false; message: string } => {
-  if (!targetUrl || typeof targetUrl !== "string") {
-    return { ok: false, message: "targetUrl이 누락되었습니다." };
-  }
-  if (!targetUrl.startsWith("https://")) {
-    return { ok: false, message: "https로 시작하는 URL만 허용됩니다." };
-  }
-  try {
-    const url = new URL(targetUrl);
-    if (url.protocol !== "https:" || !url.hostname) {
-      return { ok: false, message: "올바른 https URL이 아닙니다." };
-    }
-  } catch {
-    return { ok: false, message: "올바른 https URL이 아닙니다." };
-  }
-  return { ok: true };
-};
+import { getShortUrl, getTargetUrl } from "./service.js";
 
 const plugin: FastifyPluginAsync = async fastify => {
   fastify.post(
@@ -66,25 +39,12 @@ const plugin: FastifyPluginAsync = async fastify => {
     },
     async (request: FastifyRequest<{ Body: { targetUrl: string } }>, reply: FastifyReply) => {
       const { targetUrl } = request.body;
-      const validation = validateTargetUrl(targetUrl);
-
-      if (!validation.ok) {
-        reply.code(400).send({ message: validation.message });
+      const result = await getShortUrl(fastify.db, fastify.config.BASE_URL, targetUrl);
+      if (!result.ok) {
+        reply.code(result.status ?? 500).send({ message: result.message });
         return;
       }
-      // 유니크 충돌 시 짧게 재시도
-      const MAX_RETRIES = 3;
-      let attempt = 0;
-      while (attempt < MAX_RETRIES) {
-        const shortCode = generateShortCode();
-        const created = await createShortUrl(fastify.db, shortCode, targetUrl);
-        if (created) {
-          return { shortUrl: `${fastify.config.BASE_URL}/${shortCode}`, targetUrl };
-        }
-        attempt++;
-      }
-      // 재시도 초과 시 에러 처리
-      reply.code(500).send({ message: "단축 코드 생성에 실패했습니다. 다시 시도해주세요." });
+      return { shortUrl: result.shortUrl, targetUrl: result.targetUrl };
     }
   );
 
@@ -127,7 +87,7 @@ const plugin: FastifyPluginAsync = async fastify => {
     },
     async (request: FastifyRequest<{ Params: { shortCode: string } }>, reply: FastifyReply) => {
       const { shortCode } = request.params;
-      const target = await getTargetUrlByShortCode(fastify.db, shortCode);
+      const target = await getTargetUrl(fastify.db, shortCode);
       if (target) {
         reply.redirect(target);
         return;
