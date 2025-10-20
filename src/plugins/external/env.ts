@@ -4,8 +4,9 @@ import fastifyEnv from "@fastify/env";
 declare module "fastify" {
   export interface FastifyInstance {
     config: {
-      PORT: number;
       NODE_ENV: "development" | "production";
+      PORT: string;
+      BASE_URL: string;
       DATABASE_URL: string;
     };
   }
@@ -15,10 +16,11 @@ const schema = {
   type: "object",
   properties: {
     NODE_ENV: { type: "string", enum: ["development", "production"], default: "development" },
-    PORT: { type: "number", default: 3000 },
+    PORT: { type: "string" },
+    BASE_URL: { type: "string" },
     DATABASE_URL: { type: "string" },
   },
-  required: ["DATABASE_URL"],
+  required: ["PORT", "BASE_URL", "DATABASE_URL"],
 };
 
 export default fp(async fastify => {
