@@ -9,6 +9,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "dev": "tsx watch ./src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
     "db:generate": "drizzle-kit generate --config=drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config=drizzle.config.ts"
   },
