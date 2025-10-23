@@ -1,6 +1,4 @@
 import fp from "fastify-plugin";
-import { access } from "node:fs/promises";
-import { join } from "node:path";
 import fastifyEnv from "@fastify/env";
 
 declare module "fastify" {
@@ -26,16 +24,9 @@ const schema = {
 };
 
 export const envPlugin = fp(async fastify => {
-  if (process.env.NODE_ENV !== "production") {
-    try {
-      await access(join(process.cwd(), ".env"));
-      await fastify.register(fastifyEnv, {
-        confKey: "config",
-        schema,
-        dotenv: true,
-      });
-    } catch {
-      throw new Error(".env 파일이 필요합니다");
-    }
-  }
+  await fastify.register(fastifyEnv, {
+    confKey: "config",
+    schema,
+    dotenv: true,
+  });
 });
