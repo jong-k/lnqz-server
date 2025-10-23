@@ -22,3 +22,8 @@ export async function incrementClicksByShortCode(db: NodePgDatabase, shortCode: 
     .set({ clicks: sql`${urls.clicks} + 1` })
     .where(eq(urls.shortCode, shortCode));
 }
+
+export async function getUrlByShortCode(db: NodePgDatabase, shortCode: string) {
+  const rows = await db.select().from(urls).where(eq(urls.shortCode, shortCode)).limit(1);
+  return rows[0] ?? null;
+}

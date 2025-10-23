@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { getShortUrl, getTargetUrl, recordClicks } from "./service.js";
+import { getShortUrl, getTargetUrl, getUrlInfo, recordClick } from "./service.js";
 
 export const urlRoutes = async (fastify: FastifyInstance) => {
   fastify.post(
@@ -60,6 +60,61 @@ export const urlRoutes = async (fastify: FastifyInstance) => {
   );
 
   fastify.get(
+    "/api/urls/:shortCode",
+    {
+      schema: {
+        summary: "단축 URL 상세 조회",
+        tags: ["urls"],
+        params: {
+          type: "object",
+          properties: {
+            shortCode: {
+              type: "string",
+              description: "단축 코드(7자, 알파벳 대소문자/숫자 조합)",
+              minLength: 7,
+              maxLength: 7,
+              pattern: "^[0-9a-zA-Z]{7}$",
+              examples: ["a1b2C3D"],
+            },
+          },
+          required: ["shortCode"],
+          additionalProperties: false,
+        },
+        response: {
+          200: {
+            description: "조회 성공",
+            type: "object",
+            properties: {
+              shortCode: { type: "string", description: "단축 코드" },
+              targetUrl: { type: "string", description: "원본 URL" },
+              clicks: { type: "integer", description: "클릭 수" },
+              createdAt: { type: "string", format: "date-time", description: "생성 시각" },
+            },
+            required: ["shortCode", "targetUrl", "clicks", "createdAt"],
+          },
+          404: {
+            description: "단축 URL을 찾을 수 없음",
+            type: "object",
+            properties: { message: { type: "string" } },
+            required: ["message"],
+            additionalProperties: false,
+            examples: [{ message: "해당 단축 URL은 존재하지 않습니다." }],
+          },
+        },
+      },
+    },
+    async (request: FastifyRequest<{ Params: { shortCode: string } }>, reply: FastifyReply) => {
+      const { shortCode } = request.params;
+      const info = await getUrlInfo(fastify.db, shortCode);
+      if (!info.ok) {
+        reply.code(404).send({ message: "해당 단축 URL은 존재하지 않습니다." });
+        return;
+      }
+      reply.send(info.data);
+    }
+  );
+
+  fastify.get(
     "/:shortCode(^[0-9a-zA-Z]{7}$)",
     {
       schema: {
@@ -102,7 +157,7 @@ export const urlRoutes = async (fastify: FastifyInstance) => {
       const { shortCode } = request.params;
       const target = await getTargetUrl(fastify.db, shortCode);
       if (target) {
-        await recordClicks(fastify.db, shortCode);
+        await recordClick(fastify.db, shortCode);
         reply.redirect(target);
         return;
       }
