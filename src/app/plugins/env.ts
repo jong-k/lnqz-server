@@ -23,7 +23,7 @@ const schema = {
   required: ["PORT", "BASE_URL", "DATABASE_URL"],
 };
 
-export default fp(async fastify => {
+export const envPlugin = fp(async fastify => {
   await fastify.register(fastifyEnv, {
     confKey: "config",
     schema,
