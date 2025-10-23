@@ -1,6 +1,6 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { customAlphabet } from "nanoid";
-import { createShortUrl, getTargetUrlByShortCode } from "./repository.js";
+import { createShortUrl, getTargetUrlByShortCode, incrementClicksByShortCode } from "./repository.js";
 
 const BASE62_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DEFAULT_SHORTCODE_LENGTH = 7;
@@ -51,4 +51,8 @@ export async function getShortUrl(db: NodePgDatabase, baseUrl: string, targetUrl
 
 export async function getTargetUrl(db: NodePgDatabase, shortCode: string) {
   return getTargetUrlByShortCode(db, shortCode);
+}
+
+export async function recordClicks(db: NodePgDatabase, shortCode: string) {
+  await incrementClicksByShortCode(db, shortCode);
 }

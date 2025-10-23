@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { getShortUrl, getTargetUrl } from "./service.js";
+import { getShortUrl, getTargetUrl, recordClicks } from "./service.js";
 
 export const urlRoutes = async (fastify: FastifyInstance) => {
   fastify.post(
@@ -102,6 +102,7 @@ export const urlRoutes = async (fastify: FastifyInstance) => {
       const { shortCode } = request.params;
       const target = await getTargetUrl(fastify.db, shortCode);
       if (target) {
+        await recordClicks(fastify.db, shortCode);
         reply.redirect(target);
         return;
       }
