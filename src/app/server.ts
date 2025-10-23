@@ -4,22 +4,30 @@ import { envPlugin } from "./plugins/env.js";
 import { swaggerPlugin } from "./plugins/swagger.js";
 import { routes } from "./routes.js";
 
-const loggerOptions = {
-  level: "debug",
-  transport: {
-    target: "pino-pretty",
-    options: {
-      colorize: true,
-      singleLine: true,
-      translateTime: "SYS:HH:MM:ss.l",
-      ignore: "pid,hostname",
-    },
-  },
+const getLoggerOptions = () => {
+  const env = process.env.NODE_ENV ?? "development";
+  if (env !== "production") {
+    return {
+      level: "debug",
+      transport: {
+        target: "pino-pretty",
+        options: {
+          colorize: true,
+          singleLine: true,
+          translateTime: "SYS:HH:MM:ss.l",
+          ignore: "pid,hostname",
+        },
+      },
+    } as const;
+  }
+  return {
+    level: "info",
+  } as const;
 };
 
 export const buildServer = async () => {
   const fastify = Fastify({
-    logger: loggerOptions,
+    logger: getLoggerOptions(),
   });
 
   await fastify.register(envPlugin);
