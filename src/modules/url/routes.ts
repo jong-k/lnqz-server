@@ -1,7 +1,7 @@
-import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { getShortUrl, getTargetUrl } from "./service.js";
 
-const plugin: FastifyPluginAsync = async fastify => {
+export const urlRoutes = async (fastify: FastifyInstance) => {
   fastify.post(
     "/api/urls",
     {
@@ -109,5 +109,3 @@ const plugin: FastifyPluginAsync = async fastify => {
     }
   );
 };
-
-export default plugin;

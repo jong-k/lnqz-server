@@ -1,4 +1,6 @@
 import fp from "fastify-plugin";
+import { access } from "node:fs/promises";
+import { join } from "node:path";
 import fastifyEnv from "@fastify/env";
 
 declare module "fastify" {
@@ -23,10 +25,17 @@ const schema = {
   required: ["PORT", "BASE_URL", "DATABASE_URL"],
 };
 
-export default fp(async fastify => {
-  await fastify.register(fastifyEnv, {
-    confKey: "config",
-    schema,
-    dotenv: true,
-  });
+export const envPlugin = fp(async fastify => {
+  if (process.env.NODE_ENV !== "production") {
+    try {
+      await access(join(process.cwd(), ".env"));
+      await fastify.register(fastifyEnv, {
+        confKey: "config",
+        schema,
+        dotenv: true,
+      });
+    } catch {
+      throw new Error(".env 파일이 필요합니다");
+    }
+  }
 });

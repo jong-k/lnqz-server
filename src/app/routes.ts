@@ -1,6 +1,7 @@
-import type { FastifyPluginAsync } from "fastify";
+import { FastifyInstance } from "fastify";
+import { urlRoutes } from "../modules/url/routes.js";
 
-const plugin: FastifyPluginAsync = async fastify => {
+const defaultRoutes = (fastify: FastifyInstance) => {
   fastify.get(
     "/",
     {
@@ -42,11 +43,8 @@ const plugin: FastifyPluginAsync = async fastify => {
         },
       },
     },
-    async ({ protocol, hostname }, reply) => {
-      const port = fastify.config.PORT;
-      reply.send({
-        message: `See documentation at ${protocol}://${hostname}:${port}/docs`,
-      });
+    async (_request, reply) => {
+      reply.send({ message: "Welcome to the Link Squeeze API" });
     }
   );
 
@@ -68,4 +66,7 @@ const plugin: FastifyPluginAsync = async fastify => {
   );
 };
 
-export default plugin;
+export const routes = async (fastify: FastifyInstance) => {
+  await fastify.register(defaultRoutes);
+  await fastify.register(urlRoutes);
+};
