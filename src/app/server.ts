@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import { corsPlugin } from "./plugins/cors.js";
 import { dbPlugin } from "./plugins/db.js";
 import { envPlugin } from "./plugins/env.js";
 import { swaggerPlugin } from "./plugins/swagger.js";
@@ -33,6 +34,7 @@ export const buildServer = async () => {
   await fastify.register(envPlugin);
   await fastify.register(dbPlugin);
   await fastify.register(swaggerPlugin);
+  await fastify.register(corsPlugin);
   await fastify.register(routes);
 
   return fastify;

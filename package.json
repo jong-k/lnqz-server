@@ -20,6 +20,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.18.2",
   "dependencies": {
+    "@fastify/cors": "^11.1.0",
     "@fastify/env": "^5.0.3",
     "@fastify/postgres": "^6.0.2",
     "@fastify/swagger": "^9.5.2",
@@ -36,8 +37,8 @@
     "@types/eslint-plugin-security": "^3.0.0",
     "@types/node": "^24.7.2",
     "@types/pg": "^8.15.5",
-    "drizzle-kit": "^0.31.5",
     "dotenv": "^16.4.5",
+    "drizzle-kit": "^0.31.5",
     "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
