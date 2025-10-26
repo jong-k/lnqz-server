@@ -1,4 +1,7 @@
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 import Fastify from "fastify";
+import fs from "node:fs";
+import path from "node:path";
 import { corsPlugin } from "./plugins/cors.js";
 import { dbPlugin } from "./plugins/db.js";
 import { envPlugin } from "./plugins/env.js";
@@ -34,6 +37,21 @@ export const buildServer = async () => {
 
   await fastify.register(envPlugin);
   await fastify.register(dbPlugin);
+  // Run DB migrations at boot
+  try {
+    const drizzleMigrationsPath = path.resolve(process.cwd(), "src/infra/db/drizzle");
+    const migrationsFolder = fs.existsSync(drizzleMigrationsPath) ? drizzleMigrationsPath : null;
+    if (!migrationsFolder) {
+      fastify.log.warn("마이그레이션 폴더를 찾을 수 없습니다. 스킵합니다.");
+    } else {
+      fastify.log.info({ migrationsFolder }, "마이그레이션 실행 시작");
+      await migrate(fastify.db, { migrationsFolder });
+      fastify.log.info("마이그레이션 실행 완료");
+    }
+  } catch (err) {
+    fastify.log.error({ err }, "마이그레이션 실행 실패");
+    throw err;
+  }
   await fastify.register(swaggerPlugin);
   await fastify.register(corsPlugin);
   await fastify.register(routes);
