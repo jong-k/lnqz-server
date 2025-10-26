@@ -29,6 +29,7 @@ const getLoggerOptions = () => {
 export const buildServer = async () => {
   const fastify = Fastify({
     logger: getLoggerOptions(),
+    trustProxy: ["127.0.0.1", "::1"],
   });
 
   await fastify.register(envPlugin);
