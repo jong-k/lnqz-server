@@ -29,6 +29,8 @@ RUN pnpm install --prod --frozen-lockfile
 
 # Copy built output
 COPY --from=builder /app/dist ./dist
+# Copy migration files
+COPY --from=builder /app/src/infra/db/drizzle ./src/infra/db/drizzle
 
 EXPOSE 8080
 CMD ["pnpm", "start"]
