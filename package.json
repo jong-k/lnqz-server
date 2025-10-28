@@ -28,7 +28,8 @@
     "fastify": "^5.6.1",
     "fastify-plugin": "^5.1.0",
     "nanoid": "^5.1.6",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "pino": "^10.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
