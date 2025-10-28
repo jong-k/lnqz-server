@@ -31,17 +31,19 @@ export const buildServer = async () => {
     logger: getLoggerOptions(),
     trustProxy: ["127.0.0.1", "::1"],
   });
-  fastify.addHook("onRequest", (request, _reply, done) => {
-    fastify.log.warn("host: " + request.headers.host);
-    fastify.log.warn("origin: " + request.headers.origin);
-    fastify.log.warn("referer: " + request.headers.referer);
-    done();
-  });
 
   await fastify.register(envPlugin);
   await fastify.register(dbPlugin);
   await fastify.register(swaggerPlugin);
   await fastify.register(corsPlugin);
+
+  fastify.addHook("onRequest", (request, _reply, done) => {
+    fastify.log.warn("url: " + request.url);
+    fastify.log.warn("host: " + request.headers.host);
+    fastify.log.warn("origin: " + request.headers.origin);
+    fastify.log.warn("referer: " + request.headers.referer);
+    done();
+  });
   await fastify.register(routes);
 
   return fastify;
