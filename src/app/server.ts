@@ -14,7 +14,6 @@ const getLoggerOptions = () => {
         target: "pino-pretty",
         options: {
           colorize: true,
-          singleLine: true,
           translateTime: "SYS:HH:MM:ss.l",
           ignore: "pid,hostname",
         },
@@ -31,6 +30,12 @@ export const buildServer = async () => {
   const fastify = Fastify({
     logger: getLoggerOptions(),
     trustProxy: ["127.0.0.1", "::1"],
+  });
+  fastify.addHook("onRequest", (request, _reply, done) => {
+    fastify.log.warn("host: " + request.headers.host);
+    fastify.log.warn("origin: " + request.headers.origin);
+    fastify.log.warn("referer: " + request.headers.referer);
+    done();
   });
 
   await fastify.register(envPlugin);
