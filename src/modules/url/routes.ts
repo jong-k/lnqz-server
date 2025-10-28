@@ -6,7 +6,7 @@ export const urlRoutes = async (fastify: FastifyInstance) => {
     "/urls",
     {
       schema: {
-        summary: "단축 URL(shortUrl) 생성",
+        summary: "단축 코드(shortCode) 생성",
         tags: ["urls"],
         body: {
           type: "object",
@@ -22,7 +22,7 @@ export const urlRoutes = async (fastify: FastifyInstance) => {
         },
         response: {
           201: {
-            description: "단축 URL 생성 성공",
+            description: "단축 코드 생성 성공",
             type: "object",
             properties: {
               shortCode: { type: "string", description: "단축 코드" },
