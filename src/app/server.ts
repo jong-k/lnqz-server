@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import pino from "pino";
 import { corsPlugin } from "./plugins/cors.js";
 import { dbPlugin } from "./plugins/db.js";
 import { envPlugin } from "./plugins/env.js";
@@ -9,12 +10,11 @@ const getLoggerOptions = () => {
   const env = process.env.NODE_ENV ?? "development";
   if (env !== "production") {
     return {
-      level: "debug",
+      level: "info",
       transport: {
         target: "pino-pretty",
         options: {
           colorize: true,
-          singleLine: true,
           translateTime: "SYS:HH:MM:ss.l",
           ignore: "pid,hostname",
         },
@@ -23,6 +23,7 @@ const getLoggerOptions = () => {
   }
   return {
     level: "info",
+    timestamp: pino.stdTimeFunctions.isoTime,
   } as const;
 };
 
@@ -36,6 +37,16 @@ export const buildServer = async () => {
   await fastify.register(dbPlugin);
   await fastify.register(swaggerPlugin);
   await fastify.register(corsPlugin);
+
+  fastify.addHook("onRequest", (request, _reply, done) => {
+    fastify.log.warn({
+      url: request.url,
+      host: request.headers.host,
+      origin: request.headers.origin,
+      referer: request.headers.referer,
+    });
+    done();
+  });
   await fastify.register(routes);
 
   return fastify;
