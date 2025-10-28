@@ -1,7 +1,7 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { customAlphabet } from "nanoid";
 import {
-  createShortUrl,
+  createShortCode,
   getTargetUrlByShortCode,
   getUrlByShortCode,
   incrementClicksByShortCode,
@@ -33,9 +33,11 @@ export const validateTargetUrl = (targetUrl: unknown): { ok: true } | { ok: fals
   return { ok: true };
 };
 
-type CreateResult = { ok: true; shortUrl: string; targetUrl: string } | { ok: false; message: string; status?: number };
+type CreateResult =
+  | { ok: true; data: { shortCode: string; targetUrl: string } }
+  | { ok: false; message: string; status?: number };
 
-export async function getShortUrl(db: NodePgDatabase, baseUrl: string, targetUrl: string): Promise<CreateResult> {
+export async function getShortCode(db: NodePgDatabase, targetUrl: string): Promise<CreateResult> {
   const validation = validateTargetUrl(targetUrl);
   if (!validation.ok) {
     return { ok: false, message: validation.message, status: 400 };
@@ -45,10 +47,8 @@ export async function getShortUrl(db: NodePgDatabase, baseUrl: string, targetUrl
   let attempt = 0;
   while (attempt < MAX_RETRIES) {
     const shortCode = generateShortCode();
-    const created = await createShortUrl(db, shortCode, targetUrl);
-    if (created) {
-      return { ok: true, shortUrl: `${baseUrl}/${shortCode}`, targetUrl };
-    }
+    const created = await createShortCode(db, shortCode, targetUrl);
+    if (created) return { ok: true, data: { shortCode, targetUrl } };
     attempt++;
   }
   return { ok: false, message: "단축 코드 생성에 실패했습니다. 다시 시도해주세요.", status: 500 };

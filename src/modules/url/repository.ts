@@ -2,7 +2,7 @@ import { eq, sql } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { urls } from "./schema.js";
 
-export async function createShortUrl(db: NodePgDatabase, shortCode: string, targetUrl: string) {
+export async function createShortCode(db: NodePgDatabase, shortCode: string, targetUrl: string) {
   const inserted = await db
     .insert(urls)
     .values({ shortCode, targetUrl })
