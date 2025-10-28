@@ -137,7 +137,7 @@ export const urlRoutes = async (fastify: FastifyInstance) => {
         },
         response: {
           302: {
-            description: "원본 페이지 혹은 프론트엔드 404페이지로 리다이렉트",
+            description: "원본 페이지 혹은 프론트엔드 404 페이지로 리다이렉트",
             type: "null",
           },
         },
