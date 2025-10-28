@@ -137,18 +137,8 @@ export const urlRoutes = async (fastify: FastifyInstance) => {
         },
         response: {
           302: {
-            description: "리다이렉트 성공",
+            description: "원본 페이지 혹은 프론트엔드 404 페이지로 리다이렉트",
             type: "null",
-          },
-          404: {
-            description: "단축 URL을 찾을 수 없음",
-            type: "object",
-            properties: {
-              message: { type: "string" },
-            },
-            required: ["message"],
-            additionalProperties: false,
-            examples: [{ message: "해당 단축 URL은 존재하지 않습니다." }],
           },
         },
       },
@@ -161,7 +151,7 @@ export const urlRoutes = async (fastify: FastifyInstance) => {
         reply.redirect(targetUrl);
         return;
       }
-      reply.code(404).send({ message: "해당 단축 URL은 존재하지 않습니다." });
+      reply.redirect(`${fastify.config.SERVICE_URL}/404`);
     }
   );
 };
