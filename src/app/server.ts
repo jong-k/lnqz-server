@@ -38,10 +38,12 @@ export const buildServer = async () => {
   await fastify.register(corsPlugin);
 
   fastify.addHook("onRequest", (request, _reply, done) => {
-    fastify.log.warn("url: " + request.url);
-    fastify.log.warn("host: " + request.headers.host);
-    fastify.log.warn("origin: " + request.headers.origin);
-    fastify.log.warn("referer: " + request.headers.referer);
+    fastify.log.warn({
+      url: request.url,
+      host: request.headers.host,
+      origin: request.headers.origin,
+      referer: request.headers.referer,
+    });
     done();
   });
   await fastify.register(routes);
