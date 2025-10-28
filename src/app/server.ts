@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import pino from "pino";
 import { corsPlugin } from "./plugins/cors.js";
 import { dbPlugin } from "./plugins/db.js";
 import { envPlugin } from "./plugins/env.js";
@@ -22,7 +23,7 @@ const getLoggerOptions = () => {
   }
   return {
     level: "info",
-    timestamp: () => `,"time":"${new Date().toISOString()}"`,
+    timestamp: pino.stdTimeFunctions.isoTime,
   } as const;
 };
 
