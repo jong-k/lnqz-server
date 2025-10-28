@@ -1,12 +1,12 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { getShortUrl, getTargetUrl, getUrlInfo, recordClick } from "./service.js";
+import { getShortCode, getTargetUrl, getUrlInfo, recordClick } from "./service.js";
 
 export const urlRoutes = async (fastify: FastifyInstance) => {
   fastify.post(
-    "/api/urls",
+    "/urls",
     {
       schema: {
-        summary: "단축 URL(shortUrl) 생성",
+        summary: "단축 코드(shortCode) 생성",
         tags: ["urls"],
         body: {
           type: "object",
@@ -22,16 +22,16 @@ export const urlRoutes = async (fastify: FastifyInstance) => {
         },
         response: {
           201: {
-            description: "단축 URL 생성 성공",
+            description: "단축 코드 생성 성공",
             type: "object",
             properties: {
-              shortUrl: { type: "string", description: "단축 URL" },
+              shortCode: { type: "string", description: "단축 코드" },
               targetUrl: { type: "string", description: "원본 URL" },
             },
-            required: ["shortUrl", "targetUrl"],
+            required: ["shortCode", "targetUrl"],
             examples: [
               {
-                shortUrl: `${fastify.config.BASE_URL}/a1b2C3D`,
+                shortCode: `a1b2C3D`,
                 targetUrl: "https://example.com/path?q=1",
               },
             ],
@@ -50,17 +50,17 @@ export const urlRoutes = async (fastify: FastifyInstance) => {
     },
     async (request: FastifyRequest<{ Body: { targetUrl: string } }>, reply: FastifyReply) => {
       const { targetUrl } = request.body;
-      const result = await getShortUrl(fastify.db, fastify.config.BASE_URL, targetUrl);
+      const result = await getShortCode(fastify.db, targetUrl);
       if (!result.ok) {
         reply.code(result.status ?? 500).send({ message: result.message });
         return;
       }
-      reply.code(201).send({ shortUrl: result.shortUrl, targetUrl: result.targetUrl });
+      reply.code(201).send(result.data);
     }
   );
 
   fastify.get(
-    "/api/urls/:shortCode",
+    "/urls/:shortCode",
     {
       schema: {
         summary: "단축 URL 상세 조회",
@@ -105,12 +105,12 @@ export const urlRoutes = async (fastify: FastifyInstance) => {
     },
     async (request: FastifyRequest<{ Params: { shortCode: string } }>, reply: FastifyReply) => {
       const { shortCode } = request.params;
-      const info = await getUrlInfo(fastify.db, shortCode);
-      if (!info.ok) {
+      const result = await getUrlInfo(fastify.db, shortCode);
+      if (!result.ok) {
         reply.code(404).send({ message: "해당 단축 URL은 존재하지 않습니다." });
         return;
       }
-      reply.send(info.data);
+      reply.send(result.data);
     }
   );
 
@@ -155,10 +155,10 @@ export const urlRoutes = async (fastify: FastifyInstance) => {
     },
     async (request: FastifyRequest<{ Params: { shortCode: string } }>, reply: FastifyReply) => {
       const { shortCode } = request.params;
-      const target = await getTargetUrl(fastify.db, shortCode);
-      if (target) {
+      const targetUrl = await getTargetUrl(fastify.db, shortCode);
+      if (targetUrl) {
         await recordClick(fastify.db, shortCode);
-        reply.redirect(target);
+        reply.redirect(targetUrl);
         return;
       }
       reply.code(404).send({ message: "해당 단축 URL은 존재하지 않습니다." });
