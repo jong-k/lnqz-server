@@ -9,7 +9,7 @@ const getLoggerOptions = () => {
   const env = process.env.NODE_ENV ?? "development";
   if (env !== "production") {
     return {
-      level: "debug",
+      level: "info",
       transport: {
         target: "pino-pretty",
         options: {
@@ -23,6 +23,7 @@ const getLoggerOptions = () => {
   }
   return {
     level: "info",
+    timestamp: () => `,"time":"${new Date().toISOString()}"`,
   } as const;
 };
 
