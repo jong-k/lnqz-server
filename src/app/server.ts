@@ -37,16 +37,6 @@ export const buildServer = async () => {
   await fastify.register(dbPlugin);
   await fastify.register(swaggerPlugin);
   await fastify.register(corsPlugin);
-
-  fastify.addHook("onRequest", (request, _reply, done) => {
-    fastify.log.warn({
-      url: request.url,
-      host: request.headers.host,
-      origin: request.headers.origin,
-      referer: request.headers.referer,
-    });
-    done();
-  });
   await fastify.register(routes);
 
   return fastify;
