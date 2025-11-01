@@ -3,29 +3,6 @@ import { urlRoutes } from "../modules/url/routes.js";
 
 const defaultRoutes = (fastify: FastifyInstance) => {
   fastify.get(
-    "/",
-    {
-      schema: {
-        summary: "",
-        response: {
-          200: {
-            description: "",
-            type: "object",
-            properties: {
-              message: { type: "string", description: "" },
-            },
-            required: ["message"],
-            additionalProperties: false,
-          },
-        },
-      },
-    },
-    async (_request, reply) => {
-      reply.send({ message: "Welcome to the Link Squeeze API" });
-    }
-  );
-
-  fastify.get(
     "/health",
     {
       schema: {
